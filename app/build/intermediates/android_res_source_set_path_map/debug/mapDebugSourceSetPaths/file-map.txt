@@ -1,0 +1,8 @@
+com.aliaskane.seams.app-pngs-0 /home/kane/AndroidStudioProjects/Seams/app/build/generated/res/pngs/debug
+com.aliaskane.seams.app-updated_navigation_xml-1 /home/kane/AndroidStudioProjects/Seams/app/build/generated/updated_navigation_xml/debug
+com.aliaskane.seams.app-packageDebugResources-2 /home/kane/AndroidStudioProjects/Seams/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.aliaskane.seams.app-packageDebugResources-3 /home/kane/AndroidStudioProjects/Seams/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.aliaskane.seams.app-debug-4 /home/kane/AndroidStudioProjects/Seams/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.aliaskane.seams.app-debug-5 /home/kane/AndroidStudioProjects/Seams/app/src/debug/res
+com.aliaskane.seams.app-main-6 /home/kane/AndroidStudioProjects/Seams/app/src/main/res
+gradleHome-0 /home/kane/.gradle
