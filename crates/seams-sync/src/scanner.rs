@@ -10,6 +10,9 @@ use thiserror::Error;
 /// Deleted content is parked here before a deletion is applied; never scanned or synced.
 pub const TRASH_DIR_NAME: &str = ".seams-trash";
 
+/// Incoming files are assembled here before an atomic rename; never scanned or synced.
+pub const TMP_DIR_NAME: &str = ".seams-tmp";
+
 #[derive(Debug, Error)]
 pub enum ScanError {
     #[error("folder `{0}` does not exist")]
@@ -53,7 +56,8 @@ pub fn scan_folder(root: &Path) -> Result<Vec<ScannedFile>, ScanError> {
             let file_type = entry.file_type()?;
 
             if file_type.is_dir() {
-                if path.file_name().and_then(|n| n.to_str()) == Some(TRASH_DIR_NAME) {
+                let name = path.file_name().and_then(|n| n.to_str());
+                if name == Some(TRASH_DIR_NAME) || name == Some(TMP_DIR_NAME) {
                     continue;
                 }
                 stack.push(path);

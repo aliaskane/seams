@@ -24,8 +24,24 @@ pub enum IdentityError {
 }
 
 /// A 32-byte device identifier: blake3 fingerprint of the device certificate.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+/// Serializes as its lowercase base32 string, which keeps it usable as a JSON map key
+/// (version vectors) and readable on the wire.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DeviceId(pub [u8; 32]);
+
+impl Serialize for DeviceId {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_str(&self)
+    }
+}
+
+impl<'de> Deserialize<'de> for DeviceId {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        DeviceId::from_base32(&s)
+            .ok_or_else(|| serde::de::Error::custom("device id is not valid base32"))
+    }
+}
 
 impl DeviceId {
     /// Short display form: the first 7 base32 characters, e.g. `abcdefg`.

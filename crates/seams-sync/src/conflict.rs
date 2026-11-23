@@ -1,7 +1,6 @@
 //! The three-way conflict decision. The rules implemented here are normative in
 //! `docs/CONFLICTS.md` — keep the two in sync.
 
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use seams_identity::DeviceId;
 use seams_proto::{relation, IndexEntry, Relation};
@@ -90,6 +89,7 @@ pub fn conflict_role(self_id: &DeviceId, peer_id: &DeviceId) -> ConflictRole {
 
 /// The converged layout of one conflict: one copy keeps the original name, the other
 /// carries the conflict suffix referencing the device whose version the copy holds.
+/// Both devices compute the same layout from mtimes, never from wall clocks.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConflictLayout {
     pub primary_name: String,
@@ -100,12 +100,18 @@ pub fn conflict_layout(
     self_id: &DeviceId,
     peer_id: &DeviceId,
     original: &str,
-    now: DateTime<Utc>,
+    local_mtime_ns: u64,
+    remote_mtime_ns: u64,
 ) -> ConflictLayout {
     let copy_owner = if self_id < peer_id { peer_id } else { self_id };
     ConflictLayout {
         primary_name: original.to_string(),
-        conflict_copy_name: super::trash::conflict_name(original, copy_owner, now),
+        conflict_copy_name: super::apply::conflict_copy_name(
+            original,
+            copy_owner,
+            local_mtime_ns,
+            remote_mtime_ns,
+        ),
     }
 }
 

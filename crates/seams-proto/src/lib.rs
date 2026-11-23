@@ -95,6 +95,9 @@ pub enum Message {
         block_index: u32,
         data: Vec<u8>,
     },
+    /// Sent when a side finished all its work; both sides wait for the peer's
+    /// SyncComplete before closing, so neither session dies mid-transfer.
+    SyncComplete,
 }
 
 #[derive(Debug, Error)]
@@ -210,6 +213,7 @@ mod tests {
                 block_index: 1,
                 data: vec![7u8; 128 * 1024],
             },
+            Message::SyncComplete,
         ];
 
         for msg in &messages {

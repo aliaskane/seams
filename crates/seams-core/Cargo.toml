@@ -4,12 +4,27 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
 [dependencies]
+blake3 = { workspace = true }
+chrono = { workspace = true }
+quinn = { workspace = true }
+seams-discovery = { path = "../seams-discovery" }
 seams-identity = { path = "../seams-identity" }
+seams-proto = { path = "../seams-proto" }
 seams-sync = { path = "../seams-sync" }
+seams-transport = { path = "../seams-transport" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+tokio = { workspace = true }
+uniffi = { workspace = true, features = ["cli", "tokio"] }
 
 [dev-dependencies]
 tempfile = { workspace = true }

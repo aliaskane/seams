@@ -13,8 +13,12 @@ Core values:
 
 ## Status
 
-Phase 0 — skeleton. The Rust workspace compiles and is unit-tested; the Android app shows the
-Material 3 UI shell. Sync between devices is not wired yet (see roadmap below).
+Phase 1 — the LAN loop works end to end. The Rust engine syncs real folders between
+two nodes (covered by integration tests: bidirectional transfer, mtime restore,
+deletion-to-trash, deterministic conflict layout); the Android app lists discovered
+devices, connects with a tap, and syncs folders picked through the system picker.
+Prebuilt `libseams_core.so` binaries ship for `arm64-v8a` and `x86_64` (emulator);
+see `android/BUILDING_CORE.md` to rebuild them from source.
 
 ## Repository layout
 

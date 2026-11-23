@@ -60,8 +60,9 @@ Define `changed(state, base)` as "state's content hash differs from base's hash"
 Edge cases that fall out of the matrix rather than being special-cased:
 
 - **Edit vs delete** where the editor never saw the deletion: the deletion is rejected as
-  a conflict — the edited file wins its original name, the deleted content is restored
-  from the local trash into a conflict copy (§4), and the resolution UI asks the user.
+  a conflict — the surviving content keeps the original name on every device. Phase 1
+  stores no second copy (the deleted content is gone from the deleting device); restoring
+  the loser from the local trash into a conflict copy is planned work.
 - **Delete vs delete**: both sides deleted — `UpToDate`, file stays deleted.
 - **Create vs create** with different content: concurrent → conflict, exactly like two
   edits.
@@ -112,12 +113,14 @@ Not every folder deserves manual attention. Each folder has a policy:
 | --- | --- | --- |
 | `Manual` (default) | Conflicts wait in the UI until the user resolves them | Documents, Obsidian vaults, anything the user authors |
 | `KeepBoth` | Like Manual, but resolution is pre-applied: primary + conflict copy stay side by side indefinitely | Photo-like folders where even conflicts are just… more photos |
-| `NewestWins` | The strictly newer content replaces the other; the replaced version goes to the trash (not deleted outright) | Camera roll, app exports — append-mostly, immutable files |
+| `NewestWins` | The strictly newer content replaces the other; the replaced version goes to the trash (not deleted outright). Equal mtimes (common — the kernel stamps writes with ~4 ms granularity) are broken by the smaller device ID, so every device computes the same winner | Camera roll, app exports — append-mostly, immutable files |
 
 `NewestWins` is only *advisable* for append-mostly folders; the UI steers users there
 without forbidding anything. Policies are recorded in `seams.json` per folder and are
 changeable at any time; changing a policy never rewrites history, it only affects future
-conflicts.
+conflicts. A policy is a property of the folder and must be set to the same value on
+every device sharing the folder — with different policies two devices would resolve the
+same conflict differently.
 
 ## 6. Resolution UI
 

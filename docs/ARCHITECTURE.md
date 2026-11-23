@@ -206,18 +206,45 @@ engine together and will host the UniFFI interface that Kotlin/Swift call.
 
 ## 7. Roadmap
 
-- **Phase 0 (this skeleton):** workspace layout, protocol types, identity, scanner, VV
+- **Phase 0 — skeleton (done):** workspace layout, protocol types, identity, scanner, VV
   conflict logic, QUIC transport with pinning, mDNS discovery — all with unit tests. MD3
   UI shell with Devices / Folders / Conflicts screens.
-- **Phase 1 — LAN loop:** one folder syncs end-to-end between two devices: discovery →
-  connect → index exchange → transfer → apply. In-memory UI state driven by real events.
-- **Phase 2 — trust and polish:** persistent pairing records, SQLite index, trash with
-  purge, conflict UI with previews, per-folder policies, background service.
-- **Phase 3 — breadth:** multiple folders, selective sync, ignore files, text 3-way merge,
-  rename/move detection.
-- **Phase 4 — platforms:** UniFFI hardening, desktop shell (Tauri), iOS shell.
+- **Phase 1 — LAN loop (done):** one or more folders sync end-to-end between two devices:
+  discovery → connect → index exchange → transfer → apply, with trash on deletions and
+  deterministic conflict layouts. Integration tests drive two real nodes over loopback
+  QUIC (`crates/seams-core/tests/sync_loop.rs`). The Android app is wired to the engine
+  through UniFFI (`SeamsRuntime`), prebuilt `.so` binaries are committed for
+  `arm64-v8a`/`x86_64` (rebuild: `android/BUILDING_CORE.md`).
+- **Phase 2 — trust and polish:** pairing confirmation UI, SQLite index (the JSON index
+  store is the current stopgap), conflict resolution UI with previews, background service
+  (foreground service + watchers), auto-sync triggers.
+- **Phase 3 — breadth:** selective sync, ignore files, text 3-way merge, rename/move
+  detection, conflict-copy restore-from-trash.
+- **Phase 4 — platforms:** desktop shell (Tauri), iOS shell.
 
-## 8. Open questions
+## 8. Phase 1 implementation notes
+
+Lessons and decisions from wiring the engine for real:
+
+- **The converged index starts from the outgoing snapshot.** After a session, the local
+  index must equal "our announced state, then overridden by action results". Building it
+  from the pre-session base instead loses this device's version-vector counters, and the
+  next session silently treats concurrent edits as sequential ones (a data-loss bug we
+  hit in tests and fixed).
+- **Session completion handshake.** Both sides run symmetric session code over one QUIC
+  connection; whoever finishes first must wait for the peer's `SyncComplete` before
+  dropping the connection, or the slower side dies mid-transfer.
+- **Folder identity.** `folder_id = blake3(lowercased label)[..8]`, so two devices that
+  add a folder with the same label match automatically — no folder-id exchange UI needed
+  for the MVP.
+- **Coarse mtime.** Linux stamps writes with a coarse clock (~4 ms granularity); equal
+  mtimes are normal, so every "newest wins" comparison needs a deterministic tie-break.
+- **UniFFI boundary.** `seams-core` exposes `SeamsNode` (create/start/stop, folder CRUD,
+  `connectAndSync`, `syncKnownPeers`) and a `NodeEvents` callback; Kotlin sees suspend
+  functions and a sealed `NodeEvent` class. `DeviceId` serializes as base32 so version
+  vectors work as JSON map keys in the persisted index.
+
+## 9. Open questions
 
 - Rename detection: hash-based move detection could avoid re-transferring large renamed
   files; cost is index bookkeeping. Revisit in phase 3.

@@ -2,14 +2,27 @@
 //! conflict decisions, and the trash. The decision rules are specified in
 //! `docs/CONFLICTS.md`.
 
+pub mod apply;
 pub mod conflict;
 pub mod hash;
 pub mod index;
+pub mod plan;
 pub mod scanner;
 pub mod trash;
 
-pub use conflict::{decide, ConflictLayout, ConflictPolicy, ConflictRole, LocalFile, Resolution};
+pub use apply::{
+    conflict_copy_name, finalize_incoming, rename_to_conflict_copy, set_mtime_ns, stage_file,
+    trash_file, write_file,
+};
+pub use conflict::{
+    conflict_layout, conflict_role, decide, ConflictLayout, ConflictPolicy, ConflictRole,
+    LocalFile, Resolution,
+};
 pub use index::{FolderIndex, MemoryIndex};
+pub use plan::{
+    block_count, plan_against, snapshot_folder, ContentHasher, DiskHasher, FolderSnapshot,
+    MemoryHasher, PlanAction, PlannedFile, PlanError, SyncPlan,
+};
 pub use scanner::{scan_folder, ScannedFile, ScanError};
 
 pub use seams_proto::{increment, merge, relation, Relation, VersionVector};

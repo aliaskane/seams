@@ -17,6 +17,14 @@ pub enum HashError {
     Io(#[from] std::io::Error),
 }
 
+impl From<HashError> for std::io::Error {
+    fn from(e: HashError) -> std::io::Error {
+        match e {
+            HashError::Io(io) => io,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FileHash {
     pub whole: [u8; 32],
