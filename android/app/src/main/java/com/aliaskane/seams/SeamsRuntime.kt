@@ -48,7 +48,7 @@ object SeamsRuntime {
         val created = SeamsNode.create(dataDir.absolutePath, deviceName.ifBlank { "Android device" })
         node = created
         refreshFolders()
-        scope.launch { created.start(0u.toUShort(), EngineEvents()) }
+        scope.launch { created.start(0u.toUShort(), EngineEvents(::onEngineEvent)) }
     }
 
     fun refreshFolders() {
@@ -127,7 +127,9 @@ object SeamsRuntime {
         }
     }
 
-    private inner class EngineEvents : NodeEvents {
-        override fun onEvent(event: NodeEvent) = onEngineEvent(event)
+    private class EngineEvents(
+        private val handler: (NodeEvent) -> Unit,
+    ) : NodeEvents {
+        override fun onEvent(event: NodeEvent) = handler(event)
     }
 }

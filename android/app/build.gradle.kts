@@ -18,6 +18,12 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        // Matches the prebuilt libseams_core.so binaries in src/main/jniLibs; also
+        // keeps the JNA AAR from dragging in ABIs we do not ship an engine for.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -49,8 +55,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     // UniFFI-generated bindings talk to the Rust core over JNA; coroutines power the
-    // suspend functions the engine exposes.
-    implementation(libs.jna) { artifact { type = "jar" } }
+    // suspend functions the engine exposes. On Android JNA must come as an AAR: the
+    // plain jar has no libjnidispatch.so inside, and Native.load crashes immediately.
+    implementation(libs.jna) { artifact { type = "aar" } }
     implementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
