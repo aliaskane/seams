@@ -1,0 +1,11 @@
+[package]
+name = "seams-discovery"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+mdns-sd = { workspace = true }
+seams-identity = { path = "../seams-identity" }
+seams-proto = { path = "../seams-proto" }
+thiserror = { workspace = true }

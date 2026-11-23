@@ -1,0 +1,35 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/seams-proto",
+    "crates/seams-identity",
+    "crates/seams-discovery",
+    "crates/seams-sync",
+    "crates/seams-transport",
+    "crates/seams-core",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+postcard = { version = "1", features = ["alloc"] }
+thiserror = "2"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+data-encoding = "2"
+
+blake3 = "1"
+ed25519-dalek = { version = "2", features = ["rand_core", "pkcs8"] }
+rand = "0.8"
+rcgen = "0.13"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+quinn = "0.11"
+tokio = { version = "1", features = ["full"] }
+
+mdns-sd = "0.13"
+
+tempfile = "3"
